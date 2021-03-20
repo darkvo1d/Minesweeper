@@ -45,7 +45,7 @@ class Env:
 
         # processing result
         if ans == "X":
-            print('\n', "--" * 15, "\tOops, stepped on a mine! GAME OVER")
+            print('\n', "--" * 15, "\nOops, stepped on a mine! GAME OVER")
             print(self)
             raise StopIteration
         else:
@@ -63,64 +63,3 @@ class Env:
                 res += '{:<3}'.format(self._board[i][j])
             res += '\n'
         return res
-
-
-class Agent:
-    def __init__(self, d, n):
-        self.d = d
-        self.n = n
-        self.board = [["-" for _ in range(d)] for _ in range(d)]  # - is UNKNOWN
-        self.score = d ** 2
-
-    def __repr__(self):
-        print(' BOARD  \n')
-        res = ''
-        for i in range(self.d):
-            for j in range(self.d):
-                res += '{:<3}'.format(self.board[i][j])
-            res += '\n'
-        return res
-
-    def anyUnknown(self):
-        """Checks if the game is finished"""
-        return any("-" in row for row in self.board) and sum(row.count("-") for row in self.board) > self.n
-
-    def alreadyVisited(self, row, col):
-        """Checks if the cell is already visited by the user"""
-        if self.board[row][col] != "-":
-            print("Already visited. Pick a new cell")
-            return True
-        return False
-
-    def makeMove(self, env, row, col):
-        """User makes move to discover safe cells"""
-        if not(0 <= row < self.d) or not(0 <= col < self.d) or self.alreadyVisited(row, col):
-            raise IOError
-        self.board = env.makeMove(self.board, row, col)
-        self.score -= 1
-        print(self)
-        if not self.anyUnknown():  # check if all is done.
-            print("\n Congrats on finishing the game. \t", "Score=", self.score)
-            raise StopIteration
-
-
-def game():
-    print("Welcome to Minesweeper")
-    d = int(input("Enter dimension:"))
-    n = int(input("Enter number of mines"))
-
-    env = Env(d, n)
-    ag = Agent(d, n)
-    print(ag)
-
-    for _ in range(1 + d ** 2):
-        row, col = [int(x) for x in input("Enter row and col values separated by comma: ").split(",")]
-        try:
-            print(ag.makeMove(env, row, col))
-        except StopIteration:
-            break
-        except IOError:
-            continue
-
-
-game()
